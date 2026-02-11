@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sense AI Recruiter - Voice Flow Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151933;
+            --bg-card: #1e2139;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #2d3250;
+            --gradient-1: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+            --gradient-2: linear-gradient(135deg, #7c3aed 0%, #f59e0b 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Mono', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid;
+            border-image: var(--gradient-1) 1;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -2px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .exec-summary {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2.5rem;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .exec-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .exec-content p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.7;
+            margin-bottom: 0.8rem;
+        }
+
+        .exec-content strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .highlight {
+            color: var(--accent-primary);
+            font-weight: 700;
+        }
+
+        .highlight-success {
+            color: var(--accent-success);
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .highlight-warning {
+            color: var(--accent-warning);
+            font-weight: 700;
+            background: rgba(245, 158, 11, 0.15);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .key-finding {
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-warning);
+            padding: 1rem 1.5rem;
+            margin-top: 1rem;
+            border-radius: 8px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 1400px) {
+            .metrics-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 1000px) {
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-subtext {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            font-family: 'Space Grotesk', sans-serif;
+            padding: 1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tab::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--accent-primary);
+        }
+
+        .tab.active {
+            color: var(--accent-primary);
+        }
+
+        .tab.active::after {
+            transform: scaleX(1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .chart-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            padding-left: 3.5rem;
+        }
+
+        .chart-container canvas {
+            margin-left: 20px;
+        }
+
+        .chart-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .insights-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .insights-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--accent-secondary);
+            text-transform: uppercase;
+        }
+
+        .insight-item {
+            background: var(--bg-card);
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .insight-item:hover {
+            transform: translateX(8px);
+            border-left-color: var(--accent-secondary);
+        }
+
+        .insight-title {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--accent-primary);
+        }
+
+        .insight-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .data-table {
+            width: 100%;
+            margin-top: 1.5rem;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .data-table th {
+            background: var(--bg-primary);
+            padding: 1rem;
+            text-align: left;
+            color: var(--accent-primary);
+            font-weight: 700;
+            border-bottom: 2px solid var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .data-table td {
+            padding: 0.8rem 1rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+
+        .data-table tr:hover {
+            background: var(--bg-card);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+
+        .status-success { background: var(--accent-success); }
+        .status-warning { background: var(--accent-warning); }
+        .status-danger { background: var(--accent-danger); }
+        .status-info { background: var(--accent-primary); }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Sense AI Recruiter - Top of Funnel Analysis</h1>
+            <p class="subtitle">Date Range analyzed • [2025-04-01 → 2026-02-01]</p>
+        </div>
+
+        <div class="exec-summary">
+            <h2 class="exec-title">Executive Summary</h2>
+            <div class="exec-content">
+                <p>This analysis reviews Sense AI Recruiter's <strong>Top-of-Funnel (TOF)</strong> performance over a <strong>10 month period</strong> from April 2025 upto February 2026, covering <span class="highlight">20,284 calls to 11,172 unique candidates.</span></p>
+                
+               <p>The platform delivered a <span class="highlight-success">77.7% connection rate</span> (8,684 connected calls), reflecting strong initial engagement at scale. Engagement quality remains solid, with <span class="highlight-success">55.5% of connected candidates</span> progressing through to interview completion. Overall, this results in an <span class="highlight-success">43.2% end-to-end conversion rate</span> (4,821 completed interviews), demonstrating consistent funnel performance and effective downstream execution.</p>
+
+                <p>Call timing significantly impacts performance: evening windows (<span class="highlight-success">4PM-10PM show 48-53% connection rates</span>) substantially outperform <span class="highlight-warning">morning and midday slots (24-39% connection rates)</span>, indicating opportunity for strategic outreach scheduling.</p>
+                
+                <p>
+                
+                <p class="key-finding">Primary connection challenges stem from <span class="highlight-warning">voicemail (4,908 calls)</span> and <span class="highlight-warning">no-answer scenarios (3,751 calls)</span>, while in-call drops are driven by candidate hang-ups (2,127) and agent-initiated disconnects (1,380).</p>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+<div class="metric-card">
+    <div class="metric-label">Total Attempts</div>
+    <div class="metric-value">20,284</div>
+    <div class="metric-subtext">Call records processed</div>
+</div>
+<div class="metric-card">
+    <div class="metric-label">Unique Candidates</div>
+    <div class="metric-value">11,172</div>
+    <div class="metric-subtext">Individuals contacted</div>
+</div>
+            <div class="metric-card">
+                <div class="metric-label">Connection Rate</div>
+                <div class="metric-value">77.7%</div>
+                <div class="metric-subtext">8,684 connected / 11,172 candidates</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Completion Rate</div>
+                <div class="metric-value">55.5%</div>
+                <div class="metric-subtext">4,821 completed / 8,684 connected</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Overall Conversion</div>
+                <div class="metric-value">43.2%</div>
+                <div class="metric-subtext">4,821 completed / 11,172 candidates</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Not Connected</div>
+                <div class="metric-value">2,488</div>
+                <div class="metric-subtext">22.3% never reached</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Connected Not Completed</div>
+                <div class="metric-value">3,863</div>
+                <div class="metric-subtext">44.5% of connected calls</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg Attempts/Candidate</div>
+                <div class="metric-value">1.82</div>
+                <div class="metric-subtext">Retry strategy active</div>
+            </div>
+            <!-- <div class="metric-card">
+                <div class="metric-label">Positive Sentiment</div>
+                <div class="metric-value">29.0%</div>
+                <div class="metric-subtext">5,888 positive interactions</div>
+            </div> -->
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('funnel')">Funnel Analysis</button>
+            <button class="tab" onclick="switchTab('dropoff')">Drop-off Analysis</button>
+            <button class="tab" onclick="switchTab('insights')">Key Insights</button>
+        </div>
+
+        <div id="funnel" class="tab-content active">
+            <div class="chart-section">
+                <div class="chart-container">
+                    <h3 class="chart-title">Conversion Funnel</h3>
+                    <canvas id="funnelChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Time of Day Performance</h3>
+                    <canvas id="timeChart"></canvas>
+                </div>
+            </div>
+
+            <!-- <div class="insights-section">
+                <h3 class="insights-title">Funnel Metrics</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Stage</th>
+                            <th>Count</th>
+                            <th>% of Candidates</th>
+                            <th>% of Previous</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="status-indicator status-info"></span>Unique Candidates</td>
+                            <td>11,172</td>
+                            <td>100%</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-indicator status-success"></span>Connected</td>
+                            <td>8,684</td>
+                            <td>77.7%</td>
+                            <td>77.7%</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-indicator status-success"></span>Completed</td>
+                            <td>4,821</td>
+                            <td>43.2%</td>
+                            <td>55.5%</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-indicator status-warning"></span>Connected Not Completed</td>
+                            <td>3,863</td>
+                            <td>34.6%</td>
+                            <td>44.5%</td>
+                        </tr>
+                        <tr>
+                            <td><span class="status-indicator status-danger"></span>Never Connected</td>
+                            <td>2,488</td>
+                            <td>22.3%</td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div> -->
+        </div>
+
+        <div id="dropoff" class="tab-content">
+            <div class="chart-section">
+                <div class="chart-container">
+                    <h3 class="chart-title">No-Contact Drop Reasons</h3>
+                    <canvas id="noContactChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">In-Call Drop Reasons</h3>
+                    <canvas id="inCallChart"></canvas>
+                </div>
+            </div>
+
+            <div class="insights-section">
+                <h3 class="insights-title">Drop-off Breakdown</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Reason</th>
+                            <th>Count</th>
+                            <th>% of Category</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="3"><strong>No Contact</strong> (11,600)</td>
+                            <td>Voicemail Reached</td>
+                            <td>4,908</td>
+                            <td>42.3%</td>
+                        </tr>
+                        <tr>
+                            <td>Dial No Answer</td>
+                            <td>3,751</td>
+                            <td>32.3%</td>
+                        </tr>
+                        <tr>
+                            <td>Other (Invalid, Busy, etc.)</td>
+                            <td>2,941</td>
+                            <td>25.4%</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="3"><strong>In-Call Drops</strong> (3,863)</td>
+                            <td>User Hang-up</td>
+                            <td>2,127</td>
+                            <td>55.1%</td>
+                        </tr>
+                        <tr>
+                            <td>Agent Hang-up</td>
+                            <td>1,380</td>
+                            <td>35.7%</td>
+                        </tr>
+                        <tr>
+                            <td>Inactivity / Max Duration</td>
+                            <td>356</td>
+                            <td>9.2%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="insights" class="tab-content">
+            <div class="insights-section">
+                <h3 class="insights-title">Critical Findings</h3>
+                
+                <div class="insight-item">
+                    <div class="insight-title">
+                        <span class="status-indicator status-success"></span>
+                        Strong Connection Performance
+                    </div>
+                    <div class="insight-text">
+                        <strong>Finding:</strong> 77.7% connection rate demonstrates effective candidate reach, though 22.3% never connected despite averaging 1.82 attempts per candidate
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-title">
+                        <span class="status-indicator status-warning"></span>
+                        Evening Windows Significantly Outperform
+                    </div>
+                    <div class="insight-text">
+                        <strong>Finding:</strong> 4PM-10PM slots achieve 48-53% connection rates vs 24-39% during business hours, implying strategic timing could materially improve reach efficiency
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-title">
+                        <span class="status-indicator status-success"></span>
+                        Healthy Post-Connection Completion
+                    </div>
+                    <div class="insight-text">
+                        <strong>Finding:</strong> 55.5% of connected candidates complete interviews which indicates strong interview quality and candidate experience once engaged
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-title">
+                        <span class="status-indicator status-danger"></span>
+                        Voicemail Strategy Gap
+                    </div>
+                    <div class="insight-text">
+                        <strong>Finding:</strong> 4,908 calls (42.3% of no-contact) reach voicemail. Focusing on optimizing voicemail messaging or callback triggers could recover significant volume
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-title">
+                        <span class="status-indicator status-warning"></span>
+                        Candidate-Initiated Drops Dominate
+                    </div>
+                    <div class="insight-text">
+                        <strong>Finding:</strong> 55.1% of in-call drops are candidate hang-ups, which could suggest early conversation friction or mis-targeting requiring script/qualification review
+                    </div>
+                </div>
+
+                <div class="insight-item">
+                    <div class="insight-title">
+                        <span class="status-indicator status-info"></span>
+                        Positive Sentiment Signal
+                    </div>
+                    <div class="insight-text">
+                        <strong>Finding:</strong> 29.0% positive sentiment (5,888 calls) vs 1.2% negative (241) indicates strong candidate experience indicator despite drop challenges
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chartColors = {
+            primary: 'rgba(0, 212, 255, 0.9)',
+            primaryBorder: 'rgba(0, 212, 255, 1)',
+            secondary: 'rgba(124, 58, 237, 0.9)',
+            secondaryBorder: 'rgba(124, 58, 237, 1)',
+            success: 'rgba(16, 185, 129, 0.9)',
+            successBorder: 'rgba(16, 185, 129, 1)',
+            warning: 'rgba(245, 158, 11, 0.9)',
+            warningBorder: 'rgba(245, 158, 11, 1)',
+            danger: 'rgba(239, 68, 68, 0.9)',
+            dangerBorder: 'rgba(239, 68, 68, 1)',
+            text: '#f8fafc',
+            grid: '#2d3250'
+        };
+
+        // Funnel Chart
+        const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+        new Chart(funnelCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Contacted', 'Connected', 'Completed'],
+                datasets: [{
+                    label: 'Count',
+                    data: [11172, 8684, 4821],
+                    backgroundColor: [
+                        chartColors.primary,
+                        chartColors.warning,
+                        chartColors.success
+                    ],
+                    borderColor: [
+                        chartColors.primaryBorder,
+                        chartColors.warningBorder,
+                        chartColors.successBorder
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                layout: { padding: { left: 20, right: 20 } },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                const rates = ['100%', '77.7% connected', '43.2% completed'];
+                                return rates[context.dataIndex];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: { 
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono' },
+                            padding: 10
+                        },
+                        grid: { color: chartColors.grid }
+                    },
+                    x: {
+                        ticks: { 
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono' }
+                        },
+                        grid: { color: chartColors.grid }
+                    }
+                }
+            }
+        });
+
+        // Time of Day Chart
+        const timeCtx = document.getElementById('timeChart').getContext('2d');
+        new Chart(timeCtx, {
+            type: 'line',
+            data: {
+                labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'],
+                datasets: [{
+                    label: 'Connection Rate (%)',
+                    data: [42.9, 47.9, 39.4, 37.5, 30.4, 26.6, 31.4, 31.0, 25.5, 24.2, 29.8, 39.2, 39.2, 38.5, 38.7, 34.0, 49.2, 50.8, 48.4, 50.8, 48.4, 52.6, 47.2, 44.0],
+                    borderColor: chartColors.primaryBorder,
+                    backgroundColor: chartColors.primary,
+                    yAxisID: 'y',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 3,
+                    pointHoverRadius: 6
+                }, {
+                    label: 'Call Attempts',
+                    data: [445, 478, 454, 384, 329, 278, 242, 226, 212, 260, 245, 286, 408, 2110, 2085, 1892, 1701, 1526, 1412, 1339, 1174, 1042, 974, 782],
+                    borderColor: chartColors.warningBorder,
+                    backgroundColor: 'rgba(245, 158, 11, 0.3)',
+                    yAxisID: 'y1',
+                    tension: 0.4,
+                    fill: false,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono', size: 11 }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Connection Rate (%)',
+                            color: chartColors.text
+                        },
+                        ticks: { 
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono' }
+                        },
+                        grid: { color: chartColors.grid }
+                    },
+                    y1: {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Call Volume',
+                            color: chartColors.text
+                        },
+                        ticks: { 
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono' }
+                        },
+                        grid: { display: false }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Hour of Day (24h)',
+                            color: chartColors.text
+                        },
+                        ticks: { 
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono' }
+                        },
+                        grid: { color: chartColors.grid }
+                    }
+                }
+            }
+        });
+
+        // No Contact Chart
+        const noContactCtx = document.getElementById('noContactChart').getContext('2d');
+        new Chart(noContactCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Voicemail', 'No Answer', 'Other'],
+                datasets: [{
+                    data: [4908, 3751, 2941],
+                    backgroundColor: [
+                        chartColors.warning,
+                        chartColors.danger,
+                        'rgba(148, 163, 184, 0.8)'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#1e2139'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono', size: 11 },
+                            padding: 15
+                        }
+                    }
+                }
+            }
+        });
+
+        // In-Call Chart
+        const inCallCtx = document.getElementById('inCallChart').getContext('2d');
+        new Chart(inCallCtx, {
+            type: 'bar',
+            data: {
+                labels: ['User Hang-up', 'Agent Hang-up', 'Inactivity/Max Duration'],
+                datasets: [{
+                    label: 'Count',
+                    data: [2127, 1380, 356],
+                    backgroundColor: [
+                        chartColors.danger,
+                        chartColors.warning,
+                        chartColors.secondary
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { 
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono' }
+                        },
+                        grid: { color: chartColors.grid }
+                    },
+                    x: {
+                        ticks: { 
+                            color: chartColors.text,
+                            font: { family: 'IBM Plex Mono', size: 10 }
+                        },
+                        grid: { color: chartColors.grid }
+                    }
+                }
+            }
+        });
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+    </script>
+</body>
+</html>
