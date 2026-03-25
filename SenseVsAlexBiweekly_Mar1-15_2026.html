@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sense vs Alex - Comparison | Mar 1–15, 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --sense-primary: #0d9488;
+            --sense-light: #5eead4;
+            --sense-dark: #115e59;
+            --sense-bg: #f0fdfa;
+            --alex-primary: #2563eb;
+            --alex-light: #93c5fd;
+            --alex-dark: #1e40af;
+            --alex-bg: #eff6ff;
+            --neutral-900: #1a1a1a;
+            --neutral-700: #3d3d3d;
+            --neutral-500: #6b6b6b;
+            --neutral-300: #b8b8b8;
+            --neutral-100: #f0f0f0;
+            --neutral-50: #fafafa;
+            --green: #16a34a;
+            --green-bg: #f0fdf4;
+            --amber: #d97706;
+            --amber-bg: #fffbeb;
+            --red: #dc2626;
+            --red-bg: #fef2f2;
+            --bg: #f7f7f5;
+            --card-shadow: 0 2px 16px rgba(0,0,0,0.05);
+            --card-shadow-hover: 0 8px 32px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--neutral-900);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Header ── */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 48px 40px 40px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%; right: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(13,148,136,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -40%; left: 20%;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            position: relative; z-index: 1;
+        }
+        .header h1 .sense-text { color: var(--sense-light); }
+        .header h1 .alex-text { color: var(--alex-light); }
+        .header .subtitle {
+            font-size: 1rem;
+            color: rgba(255,255,255,0.6);
+            margin-top: 8px;
+            position: relative; z-index: 1;
+        }
+        .header .badges {
+            display: flex; gap: 12px; margin-top: 16px;
+            position: relative; z-index: 1; flex-wrap: wrap;
+        }
+        .badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        .badge.sense { background: rgba(13,148,136,0.25); color: var(--sense-light); }
+        .badge.alex { background: rgba(37,99,235,0.25); color: var(--alex-light); }
+        .badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+        .badge.sense .dot { background: var(--sense-light); }
+        .badge.alex .dot { background: var(--alex-light); }
+
+        /* ── Container ── */
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+        /* ── Context Banner ── */
+        .context-banner {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #f0d78c;
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 32px;
+        }
+        .context-banner p { font-size: 0.9rem; color: var(--neutral-700); line-height: 1.65; }
+        .context-banner strong { color: var(--neutral-900); }
+
+        /* ── Section Divider ── */
+        .section-divider {
+            display: flex; align-items: center; gap: 16px;
+            margin: 40px 0 24px;
+        }
+        .section-divider .label {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-weight: 700;
+            color: var(--neutral-900);
+            white-space: nowrap;
+        }
+        .section-divider .line {
+            flex: 1; height: 2px;
+            background: linear-gradient(90deg, var(--neutral-300), transparent);
+        }
+        .section-divider .tag {
+            font-size: 0.65rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 2px;
+            padding: 4px 12px; border-radius: 4px;
+            color: #fff; white-space: nowrap;
+        }
+        .section-divider .tag.tof { background: linear-gradient(135deg, var(--sense-dark), var(--alex-dark)); }
+        .section-divider .tag.bof { background: linear-gradient(135deg, #065f46, #10b981); }
+        .section-divider .tag.verdict { background: var(--neutral-900); }
+
+        /* ── VS Cards ── */
+        .vs-section { margin-bottom: 28px; }
+        .vs-label {
+            font-size: 0.78rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 1.2px;
+            color: var(--neutral-500); margin-bottom: 6px;
+        }
+        .vs-note {
+            font-size: 0.8rem; color: var(--neutral-500);
+            margin-bottom: 14px; font-style: italic;
+        }
+        .vs-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: stretch;
+        }
+        .vs-card {
+            background: white; border-radius: 16px;
+            padding: 28px; box-shadow: var(--card-shadow);
+            transition: box-shadow 0.2s; position: relative;
+        }
+        .vs-card:hover { box-shadow: var(--card-shadow-hover); }
+        .vs-card.sense { border-top: 3px solid var(--sense-primary); }
+        .vs-card.alex { border-top: 3px solid var(--alex-primary); }
+        .vs-card .platform-name {
+            font-size: 0.82rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+        .vs-card.sense .platform-name { color: var(--sense-primary); }
+        .vs-card.alex .platform-name { color: var(--alex-primary); }
+        .vs-card .big-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem; font-weight: 700; line-height: 1.1;
+        }
+        .vs-card.sense .big-number { color: var(--sense-primary); }
+        .vs-card.alex .big-number { color: var(--alex-primary); }
+        .vs-card .big-detail {
+            font-size: 0.85rem; color: var(--neutral-500); margin-top: 4px;
+        }
+        .vs-divider {
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 16px;
+        }
+        .vs-divider span {
+            background: var(--neutral-900); color: white;
+            font-weight: 700; font-size: 0.85rem;
+            width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .winner-tag {
+            position: absolute; top: 12px; right: 14px;
+            font-size: 0.7rem; font-weight: 600;
+            padding: 3px 10px; border-radius: 10px; letter-spacing: 0.5px;
+        }
+        .winner-tag.sense { background: var(--sense-bg); color: var(--sense-dark); }
+        .winner-tag.alex { background: var(--alex-bg); color: var(--alex-dark); }
+
+        /* ── Section Card ── */
+        .section-card {
+            background: white; border-radius: 16px;
+            padding: 32px; margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
+        }
+        .section-card h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem; color: var(--neutral-900);
+            margin-bottom: 20px;
+        }
+
+        /* ── Funnel Bars ── */
+        .funnel-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+        .funnel-col h3 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; }
+        .funnel-col.sense h3 { color: var(--sense-primary); }
+        .funnel-col.alex h3 { color: var(--alex-primary); }
+        .funnel-step { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+        .funnel-bar-wrap {
+            flex: 1; background: var(--neutral-100);
+            border-radius: 8px; height: 38px; overflow: hidden;
+        }
+        .funnel-bar {
+            height: 100%; border-radius: 8px;
+            display: flex; align-items: center;
+            padding: 0 14px; font-size: 0.82rem;
+            font-weight: 600; color: white;
+        }
+        .funnel-bar.sense { background: linear-gradient(90deg, var(--sense-dark), var(--sense-light)); }
+        .funnel-bar.alex { background: linear-gradient(90deg, var(--alex-dark), var(--alex-light)); }
+        .funnel-step-label { font-size: 0.82rem; color: var(--neutral-700); min-width: 90px; }
+        .funnel-step-count { font-size: 0.82rem; font-weight: 600; color: var(--neutral-700); min-width: 60px; text-align: right; }
+
+        .dropoff-row {
+            display: flex; align-items: center; gap: 10px;
+            margin-top: 8px; padding: 10px 14px;
+            background: #fef2f2; border-radius: 10px; border-left: 3px solid var(--red);
+        }
+        .dropoff-row .pct { font-weight: 700; color: var(--red); font-size: 0.95rem; }
+        .dropoff-row .desc { font-size: 0.82rem; color: var(--neutral-700); }
+        .dropoff-row.warn { background: #fffbeb; border-left-color: var(--amber); }
+        .dropoff-row.warn .pct { color: var(--amber); }
+
+        /* ── Chart ── */
+        .chart-container { position: relative; height: 320px; margin: 20px 0; }
+
+        /* ── Comparison Table ── */
+        .comparison-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        .comparison-table th {
+            font-size: 0.78rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--neutral-500); padding: 12px 16px;
+            border-bottom: 2px solid var(--neutral-100); text-align: left;
+        }
+        .comparison-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--neutral-100);
+            font-size: 0.9rem;
+        }
+        .comparison-table .metric-name { color: var(--neutral-700); font-weight: 500; }
+        .comparison-table .val-sense { color: var(--sense-primary); font-weight: 600; }
+        .comparison-table .val-alex { color: var(--alex-primary); font-weight: 600; }
+        .comparison-table .group-row td {
+            background: #f3f3f0; font-weight: 700;
+            font-size: 0.76rem; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--neutral-500);
+            padding: 10px 16px; border-bottom: 2px solid #e0e0e0;
+        }
+        .comparison-table .val-winner { font-weight: 700; }
+
+        /* ── Scale Grid ── */
+        .scale-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 16px; }
+        .scale-item {
+            text-align: center; padding: 18px 14px;
+            border-radius: 12px; background: var(--neutral-50);
+        }
+        .scale-item .label {
+            font-size: 0.72rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: var(--neutral-500); margin-bottom: 8px;
+        }
+        .scale-values { display: flex; justify-content: center; gap: 10px; align-items: baseline; }
+        .scale-val {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem; font-weight: 700;
+        }
+        .scale-val.sense { color: var(--sense-primary); }
+        .scale-val.alex { color: var(--alex-primary); }
+        .scale-vs { font-size: 0.75rem; color: var(--neutral-500); font-weight: 600; }
+
+        /* ── Insights Grid ── */
+        .insights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .insight-card {
+            border-radius: 14px; padding: 22px; border: 1px solid;
+        }
+        .insight-card.strength { background: #f0fdf4; border-color: #bbf7d0; }
+        .insight-card.challenge { background: #fffbeb; border-color: #fde68a; }
+        .insight-card h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; }
+        .insight-card.strength h4 { color: #15803d; }
+        .insight-card.challenge h4 { color: #b45309; }
+        .insight-card ul { list-style: none; padding: 0; }
+        .insight-card li {
+            font-size: 0.85rem; color: var(--neutral-700);
+            padding: 5px 0 5px 16px; position: relative; line-height: 1.55;
+        }
+        .insight-card li::before {
+            content: ''; position: absolute; left: 0; top: 12px;
+            width: 6px; height: 6px; border-radius: 50%;
+        }
+        .insight-card.strength li::before { background: var(--green); }
+        .insight-card.challenge li::before { background: var(--amber); }
+
+        /* ── Bottom Line ── */
+        .bottom-line {
+            background: white; border-radius: 16px;
+            padding: 32px; margin-bottom: 28px;
+            box-shadow: var(--card-shadow);
+            border-left: 4px solid var(--neutral-900);
+        }
+        .bottom-line h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem; margin-bottom: 14px;
+        }
+        .bottom-line p {
+            font-size: 0.9rem; color: var(--neutral-700); line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .bottom-line p:last-child { margin-bottom: 0; }
+
+        @media (max-width: 768px) {
+            .vs-row { grid-template-columns: 1fr; gap: 12px; }
+            .vs-divider { padding: 8px 0; }
+            .funnel-grid, .insights-grid { grid-template-columns: 1fr; }
+            .scale-grid { grid-template-columns: 1fr 1fr; }
+            .header h1 { font-size: 1.6rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1><span class="sense-text">Sense</span> vs <span class="alex-text">Alex</span> - Performance Comparison</h1>
+    <p class="subtitle">March 1–15, 2026 &bull; 15-Day Analysis Window </p>
+    <div class="badges">
+        <span class="badge sense"><span class="dot"></span> Sense AI &bull; Voice Outreach</span>
+        <span class="badge alex"><span class="dot"></span> Alex AI &bull; SMS Interviews</span>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Context Banner -->
+    <div class="context-banner">
+        <p><strong>Channel context:</strong> Sense uses <strong>proactive voice calls</strong> (phone rings, candidate answers) while Alex uses <strong>passive SMS invitations</strong> (candidate must initiate). These are fundamentally different engagement models - Sense's "connection" = live conversation; Alex's "response" = candidate took action on a text. This report covers both <strong>Top-of-Funnel</strong> (screening) and <strong>Bottom-of-Funnel</strong> (Salesforce pipeline outcomes) to give a complete picture of where each platform delivers value.</p>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  TOP OF FUNNEL                                  -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-divider">
+        <span class="tag tof">TOF</span>
+        <span class="label">Top of Funnel - Screening Performance</span>
+        <div class="line"></div>
+    </div>
+
+    <!-- Overall Conversion -->
+    <div class="vs-section">
+        <div class="vs-label">Overall Conversion Rate</div>
+        <div class="vs-note">What % of candidates who received outreach ultimately completed a screening?</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <span class="winner-tag sense">Higher Rate</span>
+                <div class="platform-name">Sense AI (Voice)</div>
+                <div class="big-number">45.1%</div>
+                <div class="big-detail">842 completed of 1,865 unique candidates</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <div class="platform-name">Alex AI (SMS)</div>
+                <div class="big-number">35.6%</div>
+                <div class="big-detail">1,009 completed of 2,831 invitations</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Connection / Response Rate -->
+    <div class="vs-section">
+        <div class="vs-label">Connection / Response Rate</div>
+        <div class="vs-note">How effectively does each channel create initial engagement?</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <span class="winner-tag sense">Higher Rate</span>
+                <div class="platform-name">Sense AI</div>
+                <div class="big-number">67.9%</div>
+                <div class="big-detail">1,267 connected of 1,865 candidates</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <div class="platform-name">Alex AI</div>
+                <div class="big-number">55.7%</div>
+                <div class="big-detail">1,578 responded of 2,831 invited</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Completed -->
+    <div class="vs-section">
+        <div class="vs-label">Total Completed Screenings</div>
+        <div class="vs-note">Absolute volume - which platform processed more candidates?</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <div class="platform-name">Sense AI</div>
+                <div class="big-number">842</div>
+                <div class="big-detail">4,685 call attempts &bull; 2.51 avg attempts/candidate</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <span class="winner-tag alex">Higher Volume</span>
+                <div class="platform-name">Alex AI</div>
+                <div class="big-number">1,009</div>
+                <div class="big-detail">2,831 invitations &bull; 439 hours of automation saved</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Funnel Breakdown -->
+    <div class="section-card">
+        <h2>Conversion Funnel Breakdown</h2>
+        <div class="funnel-grid">
+            <div class="funnel-col sense">
+                <h3>Sense (Voice)</h3>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Contacted</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:100%">100%</div></div>
+                    <span class="funnel-step-count">1,865</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Connected</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:67.9%">67.9%</div></div>
+                    <span class="funnel-step-count">1,267</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Completed</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:45.1%">45.1%</div></div>
+                    <span class="funnel-step-count">842</span>
+                </div>
+                <div class="dropoff-row">
+                    <span class="pct">32.1%</span>
+                    <span class="desc">Never connected (598 - voicemail, no answer, blank reasons)</span>
+                </div>
+                <div class="dropoff-row warn" style="margin-top:6px">
+                    <span class="pct">33.5%</span>
+                    <span class="desc">Connected but dropped (425 - mostly hang-ups within 60 seconds)</span>
+                </div>
+            </div>
+            <div class="funnel-col alex">
+                <h3>Alex (SMS)</h3>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Invited</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:100%">100%</div></div>
+                    <span class="funnel-step-count">2,831</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Responded</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:55.7%">55.7%</div></div>
+                    <span class="funnel-step-count">1,578</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Completed</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:35.6%">35.6%</div></div>
+                    <span class="funnel-step-count">1,009</span>
+                </div>
+                <div class="dropoff-row">
+                    <span class="pct">44.3%</span>
+                    <span class="desc">Pending response - 1,253 still in "Sent" status</span>
+                </div>
+                <div class="dropoff-row warn" style="margin-top:6px">
+                    <span class="pct">36.1%</span>
+                    <span class="desc">Responded but didn't complete - paused (478) + incomplete (61)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOF Charts -->
+    <div class="section-card">
+        <h2>TOF Volume Comparison</h2>
+        <div class="chart-container">
+            <canvas id="funnelChart"></canvas>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h2>Drop-off Stage Analysis</h2>
+        <div class="chart-container">
+            <canvas id="dropoffChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  BOTTOM OF FUNNEL                               -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-divider">
+        <span class="tag bof">BOF</span>
+        <span class="label">Bottom of Funnel - What Actually Converts</span>
+        <div class="line"></div>
+    </div>
+
+    <!-- Placements  THE decision metric -->
+    <div class="vs-section">
+        <div class="vs-label">Placements (This Period)</div>
+        <div class="vs-note">The metric that matters most - how many candidates actually started work?</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <div class="platform-name">Sense AI</div>
+                <div class="big-number">0</div>
+                <div class="big-detail">2 offers accepted &bull; 2 placement fall-offs &bull; 0 confirmed</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <span class="winner-tag alex">5 Placements</span>
+                <div class="platform-name">Alex AI</div>
+                <div class="big-number">5</div>
+                <div class="big-detail">3 offers accepted &bull; 5 placements &bull; 1 fall-off</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pipeline Volume -->
+    <div class="vs-section">
+        <div class="vs-label">Pipeline Volume - Reviewed by AI</div>
+        <div class="vs-note">How many job submissions moved to "Reviewing" in Salesforce?</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <div class="platform-name">Sense AI</div>
+                <div class="big-number">665</div>
+                <div class="big-detail">295 had activity (44.4%) &bull; 370 idle (55.6%)</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <span class="winner-tag alex">+46% More</span>
+                <div class="platform-name">Alex AI</div>
+                <div class="big-number">973</div>
+                <div class="big-detail">497 had activity (51.1%) &bull; 476 idle (48.9%)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Handoffs -->
+    <div class="vs-section">
+        <div class="vs-label">Handoffs to Recruiters (Combined Paths)</div>
+        <div class="vs-note">Screening path + matching engine total handoffs</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <div class="platform-name">Sense AI</div>
+                <div class="big-number">45</div>
+                <div class="big-detail">25 screening + 20 matching</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <span class="winner-tag alex">+47% More</span>
+                <div class="platform-name">Alex AI</div>
+                <div class="big-number">66</div>
+                <div class="big-detail">57 screening + 9 matching</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Submissions -->
+    <div class="vs-section">
+        <div class="vs-label">Client Submissions (Combined Paths)</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <div class="platform-name">Sense AI</div>
+                <div class="big-number">45</div>
+                <div class="big-detail">26 screening + 19 matching</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <span class="winner-tag alex">+36% More</span>
+                <div class="platform-name">Alex AI</div>
+                <div class="big-number">61</div>
+                <div class="big-detail">55 screening + 6 matching</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Idle Time -->
+    <div class="vs-section">
+        <div class="vs-label">Average Idle Days in Reviewing</div>
+        <div class="vs-note">Lower is better - how long do screened candidates sit before a recruiter acts?</div>
+        <div class="vs-row">
+            <div class="vs-card sense">
+                <div class="platform-name">Sense AI</div>
+                <div class="big-number">16.4</div>
+                <div class="big-detail">370 idle submissions across 80 jobs</div>
+            </div>
+            <div class="vs-divider"><span>VS</span></div>
+            <div class="vs-card alex">
+                <span class="winner-tag alex">1.5 Days Faster</span>
+                <div class="platform-name">Alex AI</div>
+                <div class="big-number">14.9</div>
+                <div class="big-detail">476 idle submissions across 106 jobs</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOF Screening Path Funnel -->
+    <div class="section-card">
+        <h2>Screening Path - Side by Side</h2>
+        <div class="funnel-grid">
+            <div class="funnel-col sense">
+                <h3>Sense - Screening Path (295 subs)</h3>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Handoff</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:100%">25</div></div>
+                    <span class="funnel-step-count">25</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Client Sub</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:100%">26</div></div>
+                    <span class="funnel-step-count">26</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Interview Req</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:28%">7</div></div>
+                    <span class="funnel-step-count">7</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Interview Comp</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:20%">5</div></div>
+                    <span class="funnel-step-count">5</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Offer Accepted</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar sense" style="width:8%">2</div></div>
+                    <span class="funnel-step-count">2</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Placements</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:4%;background:#e5e7eb;color:#999;min-width:28px">0</div></div>
+                    <span class="funnel-step-count" style="color:var(--red)">0</span>
+                </div>
+            </div>
+            <div class="funnel-col alex">
+                <h3>Alex - Screening Path (470 subs)</h3>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Handoff</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:100%">57</div></div>
+                    <span class="funnel-step-count">57</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Client Sub</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:96.5%">55</div></div>
+                    <span class="funnel-step-count">55</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Interview Req</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:19.3%">11</div></div>
+                    <span class="funnel-step-count">11</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Interview Comp</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:7%">4</div></div>
+                    <span class="funnel-step-count">4</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Offer Accepted</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:5.3%">3</div></div>
+                    <span class="funnel-step-count">3</span>
+                </div>
+                <div class="funnel-step">
+                    <span class="funnel-step-label">Placements</span>
+                    <div class="funnel-bar-wrap"><div class="funnel-bar alex" style="width:8.8%">5</div></div>
+                    <span class="funnel-step-count" style="color:var(--green);font-weight:700">5</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Matching Engine Comparison -->
+    <div class="section-card">
+        <h2>Matching Engine - Volume vs Quality</h2>
+        <p style="font-size:0.88rem;color:var(--neutral-500);margin-bottom:20px;font-style:italic">Sense sends up to 50 matches per job; Alex caps at 25. More volume doesn't always mean better outcomes. Chart uses log scale to make all bars comparable.</p>
+        <div class="chart-container">
+            <canvas id="matchChart"></canvas>
+        </div>
+        <div class="context-banner" style="margin-top:20px;margin-bottom:0">
+            <p><strong>Key signal:</strong> Sense's matching engine generated <strong>287 recruiter declines</strong> vs Alex's <strong>36</strong>, an 8× difference. The higher interest rate on Sense (4.9% vs 1.4%) is largely a function of volume, not precision. This creates recruiter overhead and candidate fatigue from irrelevant outreach. Alex's tighter match limits keep the pipeline lean and purposeful.</p>
+        </div>
+    </div>
+
+    <!-- BOF Chart -->
+    <div class="section-card">
+        <h2>Pipeline Progression Comparison</h2>
+        <div class="chart-container">
+            <canvas id="pipelineChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════ -->
+    <!--  COMBINED METRICS                               -->
+    <!-- ═══════════════════════════════════════════════ -->
+    <div class="section-divider">
+        <span class="tag verdict">SUMMARY</span>
+        <span class="label">Full Picture</span>
+        <div class="line"></div>
+    </div>
+
+    <!-- At a Glance -->
+    <div class="section-card">
+        <h2>At-a-Glance - Decision Metrics</h2>
+        <div class="scale-grid">
+            <div class="scale-item">
+                <div class="label">Placements</div>
+                <div class="scale-values">
+                    <span class="scale-val sense">0</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">5</span>
+                </div>
+            </div>
+            <div class="scale-item">
+                <div class="label">Completed Screenings</div>
+                <div class="scale-values">
+                    <span class="scale-val sense">842</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">1,009</span>
+                </div>
+            </div>
+            <div class="scale-item">
+                <div class="label">Client Submissions</div>
+                <div class="scale-values">
+                    <span class="scale-val sense">45</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">61</span>
+                </div>
+            </div>
+            <div class="scale-item">
+                <div class="label">Recruiter Declines</div>
+                <div class="scale-values">
+                    <span class="scale-val sense" style="color:var(--red)">287</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">36</span>
+                </div>
+            </div>
+        </div>
+        <div class="scale-grid" style="margin-top:12px">
+            <div class="scale-item">
+                <div class="label">Conversion Rate</div>
+                <div class="scale-values">
+                    <span class="scale-val sense">45.1%</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">35.6%</span>
+                </div>
+            </div>
+            <div class="scale-item">
+                <div class="label">Automation Hours</div>
+                <div class="scale-values">
+                    <span class="scale-val sense">—</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">439</span>
+                </div>
+            </div>
+            <div class="scale-item">
+                <div class="label">Avg Idle Days</div>
+                <div class="scale-values">
+                    <span class="scale-val sense">16.4</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">14.9</span>
+                </div>
+            </div>
+            <div class="scale-item">
+                <div class="label">Handoff Rate</div>
+                <div class="scale-values">
+                    <span class="scale-val sense">8.5%</span>
+                    <span class="scale-vs">vs</span>
+                    <span class="scale-val alex">12.1%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Table -->
+    <div class="section-card">
+        <h2>Detailed Metrics Comparison</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr><th>Metric</th><th>Sense AI</th><th>Alex AI</th><th>Edge</th></tr>
+            </thead>
+            <tbody>
+                <tr class="group-row"><td colspan="4">Top of Funnel</td></tr>
+                <tr><td class="metric-name">Channel</td><td class="val-sense">Voice Calls</td><td class="val-alex">SMS</td><td>—</td></tr>
+                <tr><td class="metric-name">Total Outreach</td><td class="val-sense">1,865 candidates</td><td class="val-alex">2,831 invitations</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Connection / Response Rate</td><td class="val-sense val-winner">67.9%</td><td class="val-alex">55.7%</td><td style="color:var(--sense-primary)">Sense</td></tr>
+                <tr><td class="metric-name">Completion Rate (post-engagement)</td><td class="val-sense val-winner">66.5%</td><td class="val-alex">63.9%</td><td style="color:var(--sense-primary)">Sense</td></tr>
+                <tr><td class="metric-name">End-to-End Conversion</td><td class="val-sense val-winner">45.1%</td><td class="val-alex">35.6%</td><td style="color:var(--sense-primary)">Sense</td></tr>
+                <tr><td class="metric-name">Absolute Completions</td><td class="val-sense">842</td><td class="val-alex val-winner">1,009</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Daily Throughput</td><td class="val-sense">~56/day</td><td class="val-alex val-winner">~66/day</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Automation Hours Saved</td><td class="val-sense">—</td><td class="val-alex val-winner">439 hrs</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr class="group-row"><td colspan="4">Bottom of Funnel - Pipeline</td></tr>
+                <tr><td class="metric-name">Total Reviewed</td><td class="val-sense">665</td><td class="val-alex val-winner">973</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Activity Rate</td><td class="val-sense">44.4%</td><td class="val-alex val-winner">51.1%</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Avg Idle Days</td><td class="val-sense">16.4</td><td class="val-alex val-winner">14.9</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Handoffs (Total)</td><td class="val-sense">45</td><td class="val-alex val-winner">66</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Client Submissions (Total)</td><td class="val-sense">45</td><td class="val-alex val-winner">61</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Interviews (Req / Comp)</td><td class="val-sense">8 / 6</td><td class="val-alex">12 / 4</td><td>Mixed</td></tr>
+                <tr><td class="metric-name">Offers Accepted</td><td class="val-sense">2</td><td class="val-alex val-winner">3</td><td style="color:var(--alex-primary)">Alex</td></tr>
+                <tr><td class="metric-name">Placements</td><td class="val-sense" style="color:var(--red)">0</td><td class="val-alex val-winner" style="color:var(--green)">5</td><td style="color:var(--alex-primary);font-weight:700">Alex</td></tr>
+                <tr class="group-row"><td colspan="4">Matching Engine</td></tr>
+                <tr><td class="metric-name">Job Submissions</td><td class="val-sense">3,808</td><td class="val-alex">1,110</td><td>—</td></tr>
+                <tr><td class="metric-name">Match Limit / Job</td><td class="val-sense">50</td><td class="val-alex">25</td><td>—</td></tr>
+                <tr><td class="metric-name">Interested (Campaign)</td><td class="val-sense">185 (4.9%)</td><td class="val-alex">14 (1.4%)</td><td style="color:var(--sense-primary)">Sense</td></tr>
+                <tr><td class="metric-name">Recruiter Declines</td><td class="val-sense" style="color:var(--red)">287</td><td class="val-alex val-winner">36</td><td style="color:var(--alex-primary)">Alex</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Key Insights -->
+    <div class="section-card">
+        <h2>Key Insights</h2>
+        <div class="insights-grid">
+            <div class="insight-card strength">
+                <h4>Where Sense Leads</h4>
+                <ul>
+                    <li><strong>Higher conversion rates:</strong> 45.1% end-to-end vs 35.6%. Voice outreach commands immediate attention and produces a 9.5pp advantage</li>
+                    <li><strong>Superior connection rate:</strong> 67.9% vs 55.7%. Real-time phone engagement outperforms passive SMS by 12.2pp</li>
+                    <li><strong>Matching volume:</strong> 3,808 matches vs 1,110. Higher outreach ceiling produces more interested candidates (185 vs 14)</li>
+                </ul>
+            </div>
+            <div class="insight-card strength">
+                <h4>Where Alex Leads</h4>
+                <ul>
+                    <li><strong>Placements:</strong> 5 placements vs 0 - the metric that directly drives revenue</li>
+                    <li><strong>Pipeline throughput:</strong> 973 reviewed, 66 handoffs, 61 client submissions - all materially higher than Sense</li>
+                    <li><strong>Automation ROI:</strong> 439 hours saved in 15 days (~29 hrs/day equivalent), quantifiable recruiter capacity gain</li>
+                    <li><strong>Match quality:</strong> 36 recruiter declines vs 287. Less wasted recruiter effort, less candidate fatigue</li>
+                </ul>
+            </div>
+            <div class="insight-card challenge">
+                <h4>Sense - Key Risks</h4>
+                <ul>
+                    <li><strong>Zero placements this period</strong> despite 2 offers accepted, downstream conversion is not materializing</li>
+                    <li><strong>In-call friction:</strong> 33.5% of connected candidates hang up, mostly within 60 seconds of the voice flow opening</li>
+                    <li><strong>Match quality signal:</strong> 287 recruiter declines = high "filler" volume creating overhead without proportional outcomes</li>
+                    <li><strong>Higher idle time:</strong> 16.4 avg days vs 14.9. Recruiter follow-through is slower on Sense-screened candidates</li>
+                </ul>
+            </div>
+            <div class="insight-card challenge">
+                <h4>Alex - Key Risks</h4>
+                <ul>
+                    <li><strong>SMS activation gap:</strong> 44.3% (1,253) of invitations never get a response, the single largest funnel leak</li>
+                    <li><strong>Large paused pool:</strong> 478 candidates (16.9%) stalled, representing potentially recoverable volume</li>
+                    <li><strong>Lower conversion rate:</strong> 35.6% vs 45.1%. The SMS channel inherently produces lower per-candidate yield</li>
+                    <li><strong>Recruiter variance:</strong> Conversion ranges 34–51% across recruiters, inconsistent assignment strategy</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Line -->
+    <div class="bottom-line">
+        <h2>Bottom Line</h2>
+        <p><strong>Alex is outperforming Sense on the metrics that drive revenue this period:</strong> 5 placements vs 0, 61 client submissions vs 45, 66 handoffs vs 45, and 439 hours of quantifiable automation savings. Sense holds a meaningful edge in raw conversion rates (45.1% vs 35.6%) due to the voice channel's immediacy, but that advantage is not translating into proportionally better downstream outcomes.</p>
+        <p>The matching engine comparison is particularly stark: Sense pushes 3.4× more volume but generates <strong>8× more recruiter declines</strong> (287 vs 36) without proportionally more placements. This creates recruiter overhead and candidate fatigue without delivering the conversion that justifies the volume.</p>
+        <!-- <p><strong>Recommendation:</strong> For Sense, the immediate priorities are (1) fixing the voice flow opening to reduce the 33.5% post-connection drop-off, (2) reducing the matching engine limit from 50 toward 25 to improve match quality, and (3) investigating why screened candidates have higher idle time and zero placements despite offers being accepted.</p> -->
+    </div>
+
+</div>
+
+<script>
+    // Funnel Comparison
+    new Chart(document.getElementById('funnelChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Top of Funnel', 'Engaged / Connected', 'Completed'],
+            datasets: [
+                { label: 'Sense AI', data: [1865, 1267, 842], backgroundColor: 'rgba(13,148,136,0.75)', borderColor: '#0d9488', borderWidth: 1, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 },
+                { label: 'Alex AI', data: [2831, 1578, 1009], backgroundColor: 'rgba(37,99,235,0.75)', borderColor: '#2563eb', borderWidth: 1, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top', labels: { font: { family: 'DM Sans', size: 13 }, padding: 20 } } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'DM Sans', size: 12 }, callback: v => v.toLocaleString() } },
+                x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 12 } } }
+            }
+        }
+    });
+
+    // Drop-off Chart
+    new Chart(document.getElementById('dropoffChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Pre-Engagement\nDrop Rate', 'Post-Engagement\nDrop Rate'],
+            datasets: [
+                { label: 'Sense AI', data: [32.1, 33.5], backgroundColor: 'rgba(13,148,136,0.65)', borderColor: '#0d9488', borderWidth: 1, borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.6 },
+                { label: 'Alex AI', data: [44.3, 36.1], backgroundColor: 'rgba(37,99,235,0.65)', borderColor: '#2563eb', borderWidth: 1, borderRadius: 6, barPercentage: 0.6, categoryPercentage: 0.6 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top', labels: { font: { family: 'DM Sans', size: 13 }, padding: 20 } } , tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.raw + '%' } } },
+            scales: {
+                y: { beginAtZero: true, max: 60, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'DM Sans', size: 12 }, callback: v => v + '%' } },
+                x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 12 } } }
+            }
+        }
+    });
+
+    // Matching Engine Chart
+    new Chart(document.getElementById('matchChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Job Submissions', 'Interested', 'Handoff', 'Client Sub', 'Recruiter Declines'],
+            datasets: [
+                { label: 'Sense (50 max/job)', data: [3808, 185, 20, 19, 287], backgroundColor: 'rgba(13,148,136,0.75)', borderColor: '#0d9488', borderWidth: 1, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 },
+                { label: 'Alex (25 max/job)', data: [1110, 14, 9, 6, 36], backgroundColor: 'rgba(37,99,235,0.75)', borderColor: '#2563eb', borderWidth: 1, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 }
+            ]
+        },
+options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: { family: 'DM Sans', size: 13 }, padding: 20 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.raw.toLocaleString() } }
+            },
+            scales: {
+                y: { type: 'logarithmic', grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'DM Sans', size: 12 }, callback: v => Number.isInteger(Math.log10(v)) || [5,50,500].includes(v) ? v.toLocaleString() : '' }, min: 1 },
+                x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 12 } } }
+            }
+        }
+    });
+
+    // Pipeline Comparison Chart
+    new Chart(document.getElementById('pipelineChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Reviewed', 'Had Activity', 'Handoffs', 'Client Subs', 'Offers', 'Placements'],
+            datasets: [
+                { label: 'Sense AI', data: [665, 295, 45, 45, 2, 0.1], backgroundColor: 'rgba(13,148,136,0.75)', borderColor: '#0d9488', borderWidth: 1, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 },
+                { label: 'Alex AI', data: [973, 497, 66, 61, 3, 5], backgroundColor: 'rgba(37,99,235,0.75)', borderColor: '#2563eb', borderWidth: 1, borderRadius: 6, barPercentage: 0.7, categoryPercentage: 0.65 }
+            ]
+        },
+options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: { family: 'DM Sans', size: 13 }, padding: 20 } },
+                tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + ctx.raw.toLocaleString() } }
+            },
+            scales: {
+                y: { type: 'logarithmic', grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { font: { family: 'DM Sans', size: 12 }, callback: v => Number.isInteger(Math.log10(v)) || [5,50,500].includes(v) ? v.toLocaleString() : '' }, min: 1 },
+                x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 12 } } }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
